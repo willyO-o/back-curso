@@ -13,10 +13,6 @@ Route::prefix('auth')->group(function () {
 });
 
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
-
 
 Route::middleware('auth:api')->group(function () {
 
@@ -24,3 +20,5 @@ Route::middleware('auth:api')->group(function () {
         return auth()->user();
     });
 });
+
+Route::apiResource('categorias', App\Http\Controllers\Api\CategoriaController::class);
