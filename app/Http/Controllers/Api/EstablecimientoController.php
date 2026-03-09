@@ -18,10 +18,6 @@ class EstablecimientoController extends Controller
             ->with('categoria')
             ->simplePaginate($request->input('per_page', 10), ['*'], 'page', $request->input('page', 1));
 
-        return DB::table('establecimiento')
-            ->join('categoria', 'establecimiento.categoria_id', '=', 'categoria.id')
-            ->select('establecimiento.*', 'categoria.nombre as categoria_nombre')
-            ->simplePaginate($request->input('per_page', 10), ['*'], 'page', $request->input('page', 1));
     }
 
     /**
@@ -47,7 +43,10 @@ class EstablecimientoController extends Controller
 
         }
         $establecimiento = Establecimiento::create($request->all());
-        return response()->json($establecimiento, 201);
+        return response()->json([
+            'message' => 'Establecimiento creado exitosamente',
+            'data' => $establecimiento
+        ], 201);
     }
 
     /**
@@ -55,7 +54,11 @@ class EstablecimientoController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $establecimiento = Establecimiento::findOrFail($id);
+        $establecimiento->load('categoria');
+        return response()->json([
+            'data' => $establecimiento
+        ]);
     }
 
     /**
