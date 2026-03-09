@@ -22,7 +22,11 @@ class AuthController extends Controller
         $user = auth('api')->user();
         $user->load('rol');
 
-        $refreshToken = JWTAuth::fromUser($user, ['type' => 'refresh'], auth('api')->factory()->getTTL() * 60 * 24 * 7); // 7 días
+        // Guardar TTL original del access token y generar refresh token con TTL de 7 días
+        $originalTTL = JWTAuth::factory()->getTTL();
+        JWTAuth::factory()->setTTL(60 * 24 * 7); // 7 días en minutos
+        $refreshToken = JWTAuth::claims(['type' => 'refresh'])->fromUser($user);
+        JWTAuth::factory()->setTTL($originalTTL); // Restaurar TTL original
 
         return response()
             ->json([
