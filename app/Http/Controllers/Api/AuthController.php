@@ -22,7 +22,7 @@ class AuthController extends Controller
         $user = auth('api')->user();
         $user->load('rol');
 
-        $refreshToken = JWTAuth::fromUser($user, ['type' => 'refresh']);
+        $refreshToken = JWTAuth::fromUser($user, ['type' => 'refresh'], auth('api')->factory()->getTTL() * 60 * 24 * 7); // 7 días
 
         return response()
             ->json([

@@ -19,6 +19,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/user', function () {
         return auth()->user();
     });
+    Route::apiResource('establecimientos', App\Http\Controllers\Api\EstablecimientoController::class);
 });
 
 Route::apiResource('categorias', App\Http\Controllers\Api\CategoriaController::class);

@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('servicio', function (Blueprint $table) {
             $table->id();
             $table->foreignId('establecimiento_id')->constrained('establecimiento')->onDelete('cascade');
-            $table->string('nombre');
-            $table->text('descripcion')->nullable();
+            $table->string('nombre_servicio', 250);
+            $table->text('descripcion_servicio')->nullable();
             $table->decimal('precio', 10, 2)->nullable();
             $table->enum('tipo', ['menu', 'servicio'])->default('servicio');
             $table->boolean('disponible')->default(true);
