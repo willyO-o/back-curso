@@ -14,9 +14,25 @@ class EstablecimientoController extends Controller
      */
     public function index(Request $request)
     {
-        return Establecimiento::query()
-            ->with('categoria')
-            ->simplePaginate($request->input('per_page', 10), ['*'], 'page', $request->input('page', 1));
+        $search = $request->input('search');
+        $search = str_ireplace(' ', '%', $search);
+
+        $query = Establecimiento::query()->with('categoria');
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('nombre', 'like', "%$search%")
+                    ->orWhere('descripcion', 'like', "%$search%")
+                    ->orWhere('direccion', 'like', "%$search%");
+            });
+        }
+
+        if ($request->input('categoria_id')) {
+            $query->where('categoria_id', $request->input('categoria_id'));
+        }
+
+        return $query
+            ->paginate($request->input('per_page', 10), ['*'], 'page', $request->input('page', 1));
 
     }
 
@@ -40,7 +56,6 @@ class EstablecimientoController extends Controller
             $filename = $file->hashName();
             $fullPath = $file->storeAs('uploads', $filename, 'public');
             $request->merge(['imagen' => $fullPath]);
-
         }
         $establecimiento = Establecimiento::create($request->all());
         return response()->json([
