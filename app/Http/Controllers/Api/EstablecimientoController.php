@@ -19,6 +19,8 @@ class EstablecimientoController extends Controller
 
         $query = Establecimiento::query()->with('categoria');
 
+        $ordenarPor = $request->input('sort');
+
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('nombre', 'like', "%$search%")
@@ -29,6 +31,16 @@ class EstablecimientoController extends Controller
 
         if ($request->input('categoria_id')) {
             $query->where('categoria_id', $request->input('categoria_id'));
+        }
+
+        if ($ordenarPor === 'nuevo') {
+            $query->orderBy('created_at', 'desc');
+        } elseif ($ordenarPor === 'antiguo') {
+            $query->orderBy('created_at', 'asc');
+        } elseif ($ordenarPor === 'az') {
+            $query->orderBy('nombre', 'asc');
+        } elseif ($ordenarPor === 'za') {
+            $query->orderBy('nombre', 'desc');
         }
 
         return $query
