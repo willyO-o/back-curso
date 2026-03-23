@@ -111,4 +111,15 @@ class EstablecimientoController extends Controller
     {
         //
     }
+
+    public function misEstablecimientos()
+    {
+        $userId = auth()->id();
+
+        $establecimientos = Establecimiento::where('user_id', $userId)->with('categoria')->get();
+
+        return response()->json([
+            'data' => $establecimientos
+        ]);
+    }
 }
