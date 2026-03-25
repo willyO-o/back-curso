@@ -19,7 +19,8 @@ class Establecimiento extends Model
         'horario_cierre',
         'categoria_id',
         'latitud',
-        'longitud'
+        'longitud',
+        'estado',
     ];
 
     protected $hidden = ['user_id'];

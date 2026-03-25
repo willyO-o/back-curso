@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\EstablecimientoController;
 
 
 Route::prefix('auth')->group(function () {
@@ -19,9 +20,12 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/user', function () {
         return auth()->user();
     });
-    Route::get('/establecimientos/mis-establecimientos', [App\Http\Controllers\Api\EstablecimientoController::class, 'misEstablecimientos']);
 
     Route::apiResource('establecimientos', App\Http\Controllers\Api\EstablecimientoController::class);
 });
 
 Route::apiResource('categorias', App\Http\Controllers\Api\CategoriaController::class);
+
+
+Route::get('establecimientos-public', [EstablecimientoController::class, 'establecimientosPublic']);
+Route::get('establecimientos-public/{id}', [EstablecimientoController::class, 'establecimientoIdPublic']);
