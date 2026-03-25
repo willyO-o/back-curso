@@ -54,4 +54,9 @@ class Establecimiento extends Model
     {
         return $this->belongsTo(Categoria::class, 'categoria_id');
     }
+
+    public function servicios()
+    {
+        return $this->hasMany(Servicio::class, 'establecimiento_id');
+    }
 }

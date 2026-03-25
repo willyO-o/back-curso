@@ -18,6 +18,7 @@ return new class extends Migration
             $table->text('descripcion_servicio')->nullable();
             $table->decimal('precio', 10, 2)->nullable();
             $table->enum('tipo', ['menu', 'servicio'])->default('servicio');
+            $table->string('icono', 70);
             $table->boolean('disponible')->default(true);
             $table->timestamps();
         });

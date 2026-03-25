@@ -30,6 +30,9 @@ class AuthController extends Controller
         $refreshToken = JWTAuth::claims(['type' => 'refresh'])->fromUser($user);
         JWTAuth::factory()->setTTL($originalTTL); // Restaurar TTL original
 
+        // eliminar el id del usuario del la variable user para no enviarlo al cliente
+        unset($user->id);
+
         return response()
             ->json([
                 'user' => $user,
@@ -82,7 +85,7 @@ class AuthController extends Controller
         auth('api')->logout();
 
         return response()
-            ->json(['message' => 'logout'])
+            ->json(['message' => 'Sesión cerrada exitosamente'])
             ->cookie('refresh_token', null, -1);
     }
 }

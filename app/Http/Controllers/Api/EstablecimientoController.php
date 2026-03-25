@@ -166,6 +166,7 @@ class EstablecimientoController extends Controller
             ], 404);
         }
         $establecimiento->load('categoria');
+        $establecimiento->load('servicios');
 
         return response()->json([
             'data' => $establecimiento
