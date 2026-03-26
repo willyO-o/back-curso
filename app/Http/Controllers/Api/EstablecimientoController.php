@@ -8,6 +8,7 @@ use App\Models\Establecimiento;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\StoreEstablecimeintoRequest;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 
 class EstablecimientoController extends Controller
@@ -80,12 +81,18 @@ class EstablecimientoController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        $establecimiento = Establecimiento::findOrFail($id);
+        if ($establecimiento->user_id !== auth()->id()) {
+            return response()->json([
+                'message' => 'No autorizado para actualizar este establecimiento'
+            ], 403);
+        }
+
         if ($request->method() == 'PATCH') {
             $request->validate([
                 'estado' => 'required|in:ACTIVO,INACTIVO'
             ]);
 
-            $establecimiento = Establecimiento::findOrFail($id);
             $establecimiento->estado = $request->input('estado');
             $establecimiento->save();
 
@@ -95,8 +102,26 @@ class EstablecimientoController extends Controller
             ]);
         }
 
+        if ($request->hasFile('imagen_file')) {
 
+            $imagenAnterior = $establecimiento->imagen;
 
+            $file = $request->file('imagen_file');
+            $filename = $file->hashName();
+            $fullPath = $file->storeAs('uploads', $filename, 'public');
+            $request->merge(['imagen' => $fullPath]);
+        }
+
+        $establecimiento->update($request->all());
+
+        if (isset($imagenAnterior)) {
+            Storage::disk('public')->delete($imagenAnterior);
+        }
+
+        return response()->json([
+            'message' => 'Establecimiento actualizado exitosamente',
+            'data' => $establecimiento
+        ]);
     }
 
     /**
@@ -160,16 +185,32 @@ class EstablecimientoController extends Controller
     public function establecimientoIdPublic(string $id)
     {
         $establecimiento = Establecimiento::findOrFail($id);
-        if ($establecimiento->estado !== 'ACTIVO') {
-            return response()->json([
-                'message' => 'Establecimiento no disponible'
-            ], 404);
-        }
-        $establecimiento->load('categoria');
-        $establecimiento->load('servicios');
 
-        return response()->json([
-            'data' => $establecimiento
-        ]);
+        $refreshToken = request()->cookie('refresh_token');
+
+        if (!$refreshToken) {
+            if ($establecimiento->estado !== 'ACTIVO') {
+                return response()->json(['message' => 'Establecimiento no disponible'], 404);
+            }
+            $establecimiento->load('categoria', 'servicios');
+            return response()->json(['data' => $establecimiento]);
+        }
+
+
+        $payload = JWTAuth::setToken($refreshToken)->getPayload();
+        $userId = $payload->get('sub');
+        $isOwner = $userId && $establecimiento->user_id == $userId;
+        // Si es propietario, devolver el registro completo
+        if ($isOwner) {
+            $establecimiento->load('categoria', 'servicios');
+            return response()->json(['data' => $establecimiento]);
+        }
+
+        // Si no es propietario, solo devolver si está activo
+        if ($establecimiento->estado !== 'ACTIVO') {
+            return response()->json(['message' => 'Establecimiento no disponible'], 404);
+        }
+
+        return response()->json(['data' => $establecimiento->load('categoria', 'servicios')]);
     }
 }

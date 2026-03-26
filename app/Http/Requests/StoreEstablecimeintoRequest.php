@@ -61,6 +61,7 @@ class StoreEstablecimeintoRequest extends FormRequest
             'email.unique' => 'El email ya está registrado para otro establecimiento.',
             'horario_cierre.after' => 'El horario de cierre debe ser posterior al horario de apertura.',
             'categoria_id.exists' => 'La categoría seleccionada no es válida.',
+            'imagen_file.required' => 'Debe cargar una imagen para el establecimiento.',
             'imagen_file.image' => 'El archivo debe ser una imagen.',
             'imagen_file.mimes' => 'La imagen debe ser un archivo de tipo: jpeg, png, jpg, webp.',
             'imagen_file.max' => 'La imagen no debe superar los 2MB.',
