@@ -88,4 +88,28 @@ class AuthController extends Controller
             ->json(['message' => 'Sesión cerrada exitosamente'])
             ->cookie('refresh_token', null, -1);
     }
+
+    public function changePassword(Request $request)
+    {
+        $request->validate([
+            'password_actual' => 'required|string',
+            'password_nueva' => 'required|string|min:6|confirmed',
+        ]);
+
+        $user = auth('api')->user();
+
+        // Verificar que la contraseña actual sea correcta
+        if (!password_verify($request->password_actual, $user->password)) {
+            return response()->json(['error' => 'La contraseña actual es incorrecta'], 422);
+        }
+
+        // Actualizar la contraseña
+        $user->update([
+            'password' => bcrypt($request->password_nueva)
+        ]);
+
+        return response()->json([
+            'message' => 'Contraseña actualizada correctamente'
+        ], 200);
+    }
 }
