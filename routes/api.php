@@ -35,3 +35,5 @@ Route::apiResource('categorias', App\Http\Controllers\Api\CategoriaController::c
 
 Route::get('establecimientos-public', [EstablecimientoController::class, 'establecimientosPublic']);
 Route::get('establecimientos-public/{id}', [EstablecimientoController::class, 'establecimientoIdPublic']);
+
+Route::post('chatbot', [\App\Http\Controllers\Api\ChatbotController::class, 'index']);
